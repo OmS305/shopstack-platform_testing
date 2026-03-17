@@ -9,7 +9,6 @@ payments_bp = Blueprint("payments", __name__)
 
 
 @payments_bp.route("/calculate", methods=["POST"])
-@jwt_required()
 def calculate_total():
     """Calculate the total for a cart before placing an order."""
     data = request.get_json()
@@ -19,9 +18,10 @@ def calculate_total():
 
     subtotal = float(data["subtotal"])
     discount_code = data.get("discount_code")
-
-    tax = calculate_tax(subtotal)
-
+    discounted_subtotal, discount_amount = apply_discount(subtotal, discount_code)
+    # Ensure discount is only applied once
+    total = discounted_subtotal
+    return jsonify({"total": total})
     discount_amount = 0
     discounted_subtotal = subtotal
     if discount_code:
