@@ -12,9 +12,8 @@ db = SQLAlchemy()
 jwt = JWTManager()
 
 
-from json import JSONEncoder as BaseJSONEncoder
-
-class CustomJSONEncoder(BaseJSONEncoder):
+from json import JSONEncoder
+class CustomJSONEncoder(JSONEncoder):
     """Custom JSON encoder that handles datetime and Decimal types."""
 
     def default(self, obj):
