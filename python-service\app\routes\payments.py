@@ -13,22 +13,22 @@ payments_bp = Blueprint("payments", __name__)
 def calculate_total():
     """Calculate the total for a cart before placing an order."""
     data = request.get_json()
-    
+
     if not data or "subtotal" not in data:
         return jsonify({"error": "Missing required field: subtotal"}), 400
-    
+
     subtotal = float(data["subtotal"])
     discount_code = data.get("discount_code")
-    
+
+    tax = calculate_tax(subtotal)
+
     discount_amount = 0
     discounted_subtotal = subtotal
     if discount_code:
         discounted_subtotal, discount_amount = apply_discount(subtotal, discount_code)
-    
-    tax = calculate_tax(discounted_subtotal)
-    
+
     total = discounted_subtotal + tax
-    
+
     return jsonify({
         "subtotal": subtotal,
         "discount_code": discount_code,
@@ -38,22 +38,25 @@ def calculate_total():
         "total": total,
     }), 200
 
+
+@payments_bp.route("/checkout", methods=["POST"])
+@jwt_required()
 def checkout():
     """Process payment for an order."""
     data = request.get_json()
-    
+
     if not data or "order_id" not in data:
         return jsonify({"error": "Missing required field: order_id"}), 400
-    
+
     user_id = get_jwt_identity()
     order = Order.query.filter_by(id=data["order_id"], user_id=int(user_id)).first()
-    
+
     if not order:
         return jsonify({"error": "Order not found"}), 404
-    
+
     if order.status != "pending":
         return jsonify({"error": f"Order is already {order.status}"}), 400
-    
+
     try:
         # Simulate payment processing
         order.status = "paid"
