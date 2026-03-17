@@ -1,1 +1,0 @@
-# shopstack-platform_testing
