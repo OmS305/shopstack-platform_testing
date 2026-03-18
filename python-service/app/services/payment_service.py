@@ -35,14 +35,14 @@ def apply_discount(subtotal, discount_code, applied_discount_codes=None):
         subtotal: The original subtotal.
         discount_code: The discount code string.
         applied_discount_codes: Set of already applied discount codes for idempotency.
-            IMPORTANT: This set must be shared across all discount application calls
+            ⚠️ CRITICAL: This set MUST be shared across all discount application calls
             during a single checkout session to prevent double application.
             If None, a new set is created (e.g., for isolated unit tests).
 
     Returns:
         Tuple of (discounted_subtotal, discount_amount).
     """
-    # CRITICAL: Idempotency check MUST happen first to prevent double application
+    # ⚠️ CRITICAL: Idempotency check MUST happen FIRST to prevent double application
     if applied_discount_codes is None:
         applied_discount_codes = set()
 
