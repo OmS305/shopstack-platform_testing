@@ -47,6 +47,8 @@ def search_products():
         return jsonify({"error": "Search query parameter 'q' is required"}), 400
 
     search_term = f"%{query}%"
+    # Use SQLAlchemy's ilike() which automatically parameterizes the query
+    # preventing SQL injection by design
     results = Product.query.filter(
         Product.name.ilike(search_term) | Product.description.ilike(search_term)
     ).all()
