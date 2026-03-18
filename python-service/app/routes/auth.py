@@ -56,6 +56,8 @@ def login():
         if isinstance(user.password_hash, str)
         else user.password_hash
     )
+    # Ensure password is bytes (already done), and password_hash_bytes is bytes (ensured above)
+    # bcrypt.checkpw requires both arguments to be bytes in bcrypt >= 4.0
     is_valid = bcrypt.checkpw(
         data["password"].encode("utf-8"),
         password_hash_bytes
