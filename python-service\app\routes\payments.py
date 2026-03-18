@@ -25,13 +25,20 @@ def calculate_total():
     discount_amount = 0
     discounted_subtotal = subtotal
     if discount_code:
-        # Check if discount has already been applied
-        if 'discounted_subtotal' in data and data['discounted_subtotal']:
-            discounted_subtotal = data['discounted_subtotal']
-        else:
-            discounted_subtotal, discount_amount = apply_discount(subtotal, discount_code)
+        discounted_subtotal, discount_amount = apply_discount(subtotal, discount_code)
     
     total = discounted_subtotal + tax
+    
+    # Check if discount has already been applied
+    if 'discount_applied' in data and data['discount_applied']:
+        return jsonify({
+            "subtotal": subtotal,
+            "discount_code": discount_code,
+            "discount_amount": discount_amount,
+            "discounted_subtotal": discounted_subtotal,
+            "tax": tax,
+            "total": total,
+        }), 200
     
     return jsonify({
         "subtotal": subtotal,
@@ -40,6 +47,7 @@ def calculate_total():
         "discounted_subtotal": discounted_subtotal,
         "tax": tax,
         "total": total,
+        "discount_applied": True
     }), 200
 
 
