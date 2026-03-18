@@ -87,15 +87,22 @@ def create_order():
     tax = calculate_tax(discounted_subtotal)
     total = discounted_subtotal + tax
 
-    order = Order(
-        user_id=int(user_id),
-        subtotal=subtotal,
-        tax=tax,
-        discount_amount=discount_amount,
-        total=total,
-        discount_code=discount_code,
-        discount_applied=True,
-    )
+    # Only set discount_code and discount_applied if a discount was actually applied
+    order_kwargs = {
+        "user_id": int(user_id),
+        "subtotal": subtotal,
+        "tax": tax,
+        "discount_amount": discount_amount,
+        "total": total,
+    }
+    if discount_amount > 0:
+        order_kwargs["discount_code"] = discount_code
+        order_kwargs["discount_applied"] = True
+    else:
+        order_kwargs["discount_code"] = None
+        order_kwargs["discount_applied"] = False
+
+    order = Order(**order_kwargs)
     db.session.add(order)
     db.session.flush()
 
