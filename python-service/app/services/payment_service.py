@@ -42,6 +42,7 @@ def apply_discount(subtotal, discount_code, applied_discount_codes=None):
     Returns:
         Tuple of (discounted_subtotal, discount_amount).
     """
+    # CRITICAL: Idempotency check MUST happen first to prevent double application
     if applied_discount_codes is None:
         applied_discount_codes = set()
 
