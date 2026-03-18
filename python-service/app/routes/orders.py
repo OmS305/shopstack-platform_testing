@@ -81,14 +81,15 @@ def create_order():
     # Calculate tax and discount
     from app.services.payment_service import calculate_tax, apply_discount
 
-    tax = calculate_tax(subtotal)
-    discount_amount = 0
     discount_code = data.get("discount_code")
-
+    discount_amount = 0
+    discounted_subtotal = subtotal
+    applied_discount_codes = set()
     if discount_code:
-        subtotal, discount_amount = apply_discount(subtotal, discount_code)
+        discounted_subtotal, discount_amount = apply_discount(subtotal, discount_code, applied_discount_codes)
 
-    total = subtotal + tax - discount_amount
+    tax = calculate_tax(discounted_subtotal)
+    total = discounted_subtotal + tax
 
     order = Order(
         user_id=int(user_id),
@@ -97,6 +98,7 @@ def create_order():
         discount_amount=discount_amount,
         total=total,
         discount_code=discount_code,
+        discount_applied=True,
     )
     db.session.add(order)
     db.session.flush()
