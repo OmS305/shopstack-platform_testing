@@ -63,3 +63,24 @@ def apply_discount(subtotal, discount_code, applied_discount_codes=None):
 
     discounted_subtotal = subtotal - discount_amount
     return round(discounted_subtotal, 2), round(discount_amount, 2)
+def apply_discount_if_not_already_applied(subtotal, discount_code, discount_applied_flag):
+    """Apply discount only if not already applied, using a persistent flag.
+
+    Args:
+        subtotal: The original subtotal.
+        discount_code: The discount code string.
+        discount_applied_flag: Boolean flag indicating if discount was already applied.
+            Used to ensure idempotency across multiple checkout stages.
+
+    Returns:
+        Tuple of (discounted_subtotal, discount_amount).
+    """
+    if discount_applied_flag:
+        return subtotal, 0
+
+    discounted_subtotal, discount_amount = apply_discount(subtotal, discount_code)
+
+    if discount_amount > 0:
+        return discounted_subtotal, discount_amount
+    return subtotal, 0
+
