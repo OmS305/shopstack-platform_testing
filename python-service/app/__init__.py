@@ -3,24 +3,22 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 
-from flask.json import JSONEncoder
-
 from datetime import datetime, date
 from decimal import Decimal
+from flask.json.provider import DefaultJSONProvider
 
 db = SQLAlchemy()
 jwt = JWTManager()
-from flask import json
-from json import JSONEncoder
-class CustomJSONEncoder(json.JSONEncoder):
-    """Custom JSON encoder that handles datetime and Decimal types."""
+
+class CustomJSONProvider(DefaultJSONProvider):
+    """Custom JSON provider that handles datetime and Decimal types."""
 
     def default(self, obj):
         if isinstance(obj, (datetime, date)):
             return obj.isoformat()
         if isinstance(obj, Decimal):
             return float(obj)
-        return json.JSONEncoder.default(self, obj)
+        return super().default(obj)
 
 
 def create_app(config_name=None):
@@ -30,8 +28,9 @@ def create_app(config_name=None):
     from app.config import get_config
     app.config.from_object(get_config(config_name))
 
-    # Set custom JSON encoder
-    app.json_encoder = CustomJSONEncoder
+    # Set custom JSON provider (Flask 2.3+)
+    app.json_provider_class = CustomJSONProvider
+    app.json = CustomJSONProvider(app)
 
     # Initialize extensions
     db.init_app(app)
