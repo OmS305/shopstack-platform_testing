@@ -1,6 +1,26 @@
 import os
 
 
+def _env(primary, fallback=None, default=None):
+    value = os.environ.get(primary)
+    if value is not None:
+        return value
+    if fallback:
+        fallback_value = os.environ.get(fallback)
+        if fallback_value is not None:
+            return fallback_value
+    return default
+
+
+def _build_postgres_uri(default_host="localhost"):
+    user = _env("DATABASE_USER", "DB_USER", "appuser")
+    password = _env("DATABASE_PASSWORD", "DB_PASS", "apppassword")
+    host = _env("DATABASE_HOST", "DB_HOST", default_host)
+    port = _env("DATABASE_PORT", "DB_PORT", "5432")
+    name = _env("DATABASE_NAME", "DB_NAME", "ecommerce")
+    return f"postgresql://{user}:{password}@{host}:{port}/{name}"
+
+
 class BaseConfig:
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -10,38 +30,17 @@ class BaseConfig:
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = (
-        f"postgresql://"
-        f"{os.environ.get('DATABASE_USER', 'appuser')}:"
-        f"{os.environ.get('DATABASE_PASSWORD', 'apppassword')}@"
-        f"localhost:"
-        f"{os.environ.get('DATABASE_PORT', '5432')}/"
-        f"{os.environ.get('DATABASE_NAME', 'ecommerce')}"
-    )
+    SQLALCHEMY_DATABASE_URI = _build_postgres_uri(default_host="localhost")
 
 
 class StagingConfig(BaseConfig):
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = (
-        f"postgresql://"
-        f"{os.environ.get('DB_USER', 'appuser')}:"
-        f"{os.environ.get('DB_PASS', 'apppassword')}@"
-        f"{os.environ.get('DB_HOST', 'localhost')}:"
-        f"{os.environ.get('DB_PORT', '5432')}/"
-        f"{os.environ.get('DB_NAME', 'ecommerce')}"
-    )
+    SQLALCHEMY_DATABASE_URI = _build_postgres_uri(default_host="postgres")
 
 
 class ProductionConfig(BaseConfig):
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = (
-        f"postgresql://"
-        f"{os.environ.get('DB_USER', 'appuser')}"
-        f"{os.environ.get('DB_PASS', 'apppassword')}@"
-        f"{os.environ.get('DB_HOST')}"
-        f"{os.environ.get('DB_PORT', '5432')}/"
-        f"{os.environ.get('DB_NAME', 'ecommerce')}"
-    )
+    SQLALCHEMY_DATABASE_URI = _build_postgres_uri(default_host="postgres")
 
 
 class TestingConfig(BaseConfig):
