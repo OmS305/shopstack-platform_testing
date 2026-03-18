@@ -1,5 +1,10 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
+import logging
+
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
 
 from app import db
 from app.models.order import Order
@@ -13,22 +18,35 @@ payments_bp = Blueprint("payments", __name__)
 def calculate_total():
     """Calculate the total for a cart before placing an order."""
     data = request.get_json()
-
+    
     if not data or "subtotal" not in data:
         return jsonify({"error": "Missing required field: subtotal"}), 400
-
+    
     subtotal = float(data["subtotal"])
     discount_code = data.get("discount_code")
-
+    
     tax = calculate_tax(subtotal)
-
+    
     discount_amount = 0
     discounted_subtotal = subtotal
     if discount_code:
         discounted_subtotal, discount_amount = apply_discount(subtotal, discount_code)
-
+    
     total = discounted_subtotal + tax
-
+    
+    # Check if discount has already been applied to avoid double application
+    from app.models.order import Order
+    order = Order.query.filter_by(user_id=get_jwt_identity(), discount_code=discount_code).first()
+    if order and order.discount_applied:
+        return jsonify({
+            "subtotal": subtotal,
+            "discount_code": discount_code,
+            "discount_amount": 0,
+            "discounted_subtotal": subtotal,
+            "tax": tax,
+            "total": order.total,
+        }), 200
+    
     return jsonify({
         "subtotal": subtotal,
         "discount_code": discount_code,
