@@ -80,12 +80,8 @@ def create_order():
     discounted_subtotal = subtotal
     applied_discount_codes = set()
     if discount_code:
-        # Ensure idempotency: only apply discount if not already applied
-        if discount_code not in applied_discount_codes:
-            discounted_subtotal, discount_amount = apply_discount(subtotal, discount_code, applied_discount_codes)
-        else:
-            # Discount already applied — ignore duplicate
-            discount_amount = 0
+        # apply_discount internally handles idempotency via the shared applied_discount_codes set
+        discounted_subtotal, discount_amount = apply_discount(subtotal, discount_code, applied_discount_codes)
 
     tax = calculate_tax(discounted_subtotal)
     total = discounted_subtotal + tax
