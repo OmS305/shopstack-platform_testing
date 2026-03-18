@@ -80,10 +80,14 @@ def create_order():
     discount_amount = 0
     discounted_subtotal = subtotal
     applied_discount_codes = set()
+    discount_applied_flag = data.get("discount_applied", False)
     if discount_code:
         # Apply discount only once per checkout session by relying on idempotency inside apply_discount()
         # The set is passed by reference and maintained across calls to ensure no double application
-        discounted_subtotal, discount_amount = apply_discount(subtotal, discount_code, applied_discount_codes)
+        # discount_applied_flag ensures idempotency across stages (e.g., cart preview vs final confirmation)
+        discounted_subtotal, discount_amount = apply_discount(
+            subtotal, discount_code, applied_discount_codes, discount_applied_flag
+        )
 
     tax = calculate_tax(discounted_subtotal)
     total = discounted_subtotal + tax

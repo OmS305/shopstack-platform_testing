@@ -31,7 +31,7 @@ def calculate_tax(subtotal):
     return float(tax)
 
 
-def apply_discount(subtotal, discount_code, applied_discount_codes=None):
+def apply_discount(subtotal, discount_code, applied_discount_codes=None, discount_applied_flag=None):
     """Apply a discount code to a subtotal.
 
     Args:
@@ -41,11 +41,17 @@ def apply_discount(subtotal, discount_code, applied_discount_codes=None):
             ⚠️ CRITICAL: This set MUST be shared across all discount application calls
             during a single checkout session to prevent double application.
             If None, a new set is created (e.g., for isolated unit tests).
+        discount_applied_flag: Boolean flag indicating if discount was already applied.
+            Used to ensure idempotency across multiple checkout stages.
+            Takes precedence over applied_discount_codes if provided.
 
     Returns:
         Tuple of (discounted_subtotal, discount_amount).
     """
     # ⚠️ CRITICAL: Idempotency check MUST happen FIRST to prevent double application
+    if discount_applied_flag is True:
+        return subtotal, 0
+
     if applied_discount_codes is None:
         applied_discount_codes = set()
 
