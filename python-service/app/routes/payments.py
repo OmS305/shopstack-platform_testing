@@ -34,15 +34,15 @@ def calculate_total():
     
     total = discounted_subtotal + tax
     
-    # Check if discount has already been applied
+    # Check if discount has already been applied to avoid double application
     from app.models.order import Order
-    order = Order.query.filter_by(user_id=get_jwt_identity()).first()
-    if order and order.discount_code == discount_code:
+    order = Order.query.filter_by(user_id=get_jwt_identity(), discount_code=discount_code).first()
+    if order and order.discount_applied:
         return jsonify({
             "subtotal": subtotal,
             "discount_code": discount_code,
-            "discount_amount": discount_amount,
-            "discounted_subtotal": discounted_subtotal,
+            "discount_amount": 0,
+            "discounted_subtotal": subtotal,
             "tax": tax,
             "total": order.total,
         }), 200
