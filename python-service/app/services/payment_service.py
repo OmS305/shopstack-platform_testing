@@ -21,6 +21,8 @@ def calculate_tax(subtotal):
     Returns:
         The tax amount rounded to 2 decimal places.
     """
+    # Round to 2 decimal places before conversion to avoid floating-point representation artifacts
+    subtotal = round(subtotal, 2)
     subtotal_decimal = Decimal(str(subtotal))
     tax = (subtotal_decimal * TAX_RATE).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
     return float(tax)
