@@ -24,11 +24,11 @@ class StagingConfig(BaseConfig):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = (
         f"postgresql://"
-        f"{os.environ.get('DB_USER', 'appuser')}:"
-        f"{os.environ.get('DB_PASS', 'apppassword')}@"
-        f"{os.environ.get('DB_HOST', 'localhost')}:"
-        f"{os.environ.get('DB_PORT', '5432')}/"
-        f"{os.environ.get('DB_NAME', 'ecommerce')}"
+        f"{os.environ.get('DATABASE_USER', 'appuser')}:"
+        f"{os.environ.get('DATABASE_PASSWORD', 'apppassword')}@"
+        f"{os.environ.get('DATABASE_HOST', 'localhost')}:"
+        f"{os.environ.get('DATABASE_PORT', '5432')}/"
+        f"{os.environ.get('DATABASE_NAME', 'ecommerce')}"
     )
 
 
@@ -36,11 +36,11 @@ class ProductionConfig(BaseConfig):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = (
         f"postgresql://"
-        f"{os.environ.get('DB_USER', 'appuser')}"
-        f"{os.environ.get('DB_PASS', 'apppassword')}@"
-        f"{os.environ.get('DB_HOST')}"
-        f"{os.environ.get('DB_PORT', '5432')}/"
-        f"{os.environ.get('DB_NAME', 'ecommerce')}"
+        f"{os.environ.get('DATABASE_USER', 'appuser')}:"
+        f"{os.environ.get('DATABASE_PASSWORD', 'apppassword')}@"
+        f"{os.environ.get('DATABASE_HOST')}"
+        f"{os.environ.get('DATABASE_PORT', '5432')}/"
+        f"{os.environ.get('DATABASE_NAME', 'ecommerce')}"
     )
 
 
