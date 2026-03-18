@@ -72,6 +72,12 @@ def checkout():
     if order.status != "pending":
         return jsonify({"error": f"Order is already {order.status}"}), 400
 
+    # Apply discount only if not already applied (prevents double discounting)
+    if order.discount_code and not order.discount_applied:
+        order.total, _ = apply_discount(order.total, order.discount_code)
+        order.discount_applied = True
+        db.session.add(order)
+
     # Simulate payment processing
     order.status = "paid"
     logging.info(f"Payment processed for order {order.id}, total: {order.total}")
