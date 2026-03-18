@@ -19,6 +19,7 @@ def list_orders():
     result = []
     for order in orders:
         order_data = order.to_dict(include_items=True)
+        result.append(order_data)
 
     return jsonify({
         "orders": result,
