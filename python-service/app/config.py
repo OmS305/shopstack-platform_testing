@@ -24,11 +24,11 @@ class StagingConfig(BaseConfig):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = (
         f"postgresql://"
-        f"{os.environ.get('DATABASE_USER', 'appuser')}:"
-        f"{os.environ.get('DATABASE_PASSWORD', 'apppassword')}@"
-        f"{os.environ.get('DATABASE_HOST', 'db')}:"
-        f"{os.environ.get('DATABASE_PORT', '5432')}/"
-        f"{os.environ.get('DATABASE_NAME', 'ecommerce')}"
+        f"{os.environ.get('POSTGRES_USER', 'appuser')}:"
+        f"{os.environ.get('POSTGRES_PASSWORD', 'apppassword')}@"
+        f"{os.environ.get('POSTGRES_HOST', 'db')}:"
+        f"{os.environ.get('POSTGRES_PORT', '5432')}/"
+        f"{os.environ.get('POSTGRES_DB', 'ecommerce')}"
     )
 
 
@@ -36,10 +36,10 @@ class ProductionConfig(BaseConfig):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = (
         f"postgresql://"
-        f"{os.environ.get('DATABASE_USER', 'appuser')}:"
-        f"{os.environ.get('DATABASE_PASSWORD', 'apppassword')}@"
-        f"{os.environ.get('DATABASE_HOST')}:{os.environ.get('DATABASE_PORT', '5432')}/"
-        f"{os.environ.get('DATABASE_NAME', 'ecommerce')}"
+        f"{os.environ.get('POSTGRES_USER', 'appuser')}:"
+        f"{os.environ.get('POSTGRES_PASSWORD', 'apppassword')}@"
+        f"{os.environ.get('POSTGRES_HOST')}:{os.environ.get('POSTGRES_PORT', '5432')}/"
+        f"{os.environ.get('POSTGRES_DB', 'ecommerce')}"
     )
 
 
