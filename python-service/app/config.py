@@ -26,7 +26,7 @@ class StagingConfig(BaseConfig):
         f"postgresql://"
         f"{os.environ.get('DATABASE_USER', 'appuser')}:"
         f"{os.environ.get('DATABASE_PASSWORD', 'apppassword')}@"
-        f"{os.environ.get('DATABASE_HOST', 'localhost')}:"
+        f"{os.environ.get('DATABASE_HOST', 'db')}:"
         f"{os.environ.get('DATABASE_PORT', '5432')}/"
         f"{os.environ.get('DATABASE_NAME', 'ecommerce')}"
     )
@@ -38,8 +38,7 @@ class ProductionConfig(BaseConfig):
         f"postgresql://"
         f"{os.environ.get('DATABASE_USER', 'appuser')}:"
         f"{os.environ.get('DATABASE_PASSWORD', 'apppassword')}@"
-        f"{os.environ.get('DATABASE_HOST')}"
-        f"{os.environ.get('DATABASE_PORT', '5432')}/"
+        f"{os.environ.get('DATABASE_HOST')}:{os.environ.get('DATABASE_PORT', '5432')}/"
         f"{os.environ.get('DATABASE_NAME', 'ecommerce')}"
     )
 
