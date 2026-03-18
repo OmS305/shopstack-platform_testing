@@ -83,7 +83,10 @@ def create_order():
     if discount_code:
         # CRITICAL: Pass the shared set to ensure idempotency across all discount application calls
         # during this checkout session. The set must NOT be recreated between preview and final calculation.
-        discounted_subtotal, discount_amount = apply_discount(subtotal, discount_code, applied_discount_codes)
+        # Explicit check ensures idempotency even if discount was already applied elsewhere
+        if discount_code not in applied_discount_codes:
+            discounted_subtotal, discount_amount = apply_discount(subtotal, discount_code, applied_discount_codes)
+            applied_discount_codes.add(discount_code)
 
     tax = calculate_tax(discounted_subtotal)
     total = discounted_subtotal + tax
