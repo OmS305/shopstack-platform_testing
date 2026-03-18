@@ -4,6 +4,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db
 from app.models.order import Order, OrderItem
 from app.models.product import Product
+from sqlalchemy.orm import joinedload
 
 orders_bp = Blueprint("orders", __name__)
 
@@ -13,18 +14,11 @@ orders_bp = Blueprint("orders", __name__)
 def list_orders():
     user_id = get_jwt_identity()
 
-    orders = Order.query.filter_by(user_id=int(user_id)).all()
+    orders = Order.query.options(joinedload(Order.items)).filter_by(user_id=int(user_id)).all()
 
     result = []
     for order in orders:
-        order_data = order.to_dict()
-        order_data["items"] = []
-        for item in order.items:
-            item_data = item.to_dict()
-            if item.product:
-                item_data["product_name"] = item.product.name
-            order_data["items"].append(item_data)
-        result.append(order_data)
+        order_data = order.to_dict(include_items=True)
 
     return jsonify({
         "orders": result,
@@ -81,14 +75,15 @@ def create_order():
     # Calculate tax and discount
     from app.services.payment_service import calculate_tax, apply_discount
 
-    tax = calculate_tax(subtotal)
-    discount_amount = 0
     discount_code = data.get("discount_code")
-
+    discount_amount = 0
+    discounted_subtotal = subtotal
+    applied_discount_codes = set()
     if discount_code:
-        subtotal, discount_amount = apply_discount(subtotal, discount_code)
+        discounted_subtotal, discount_amount = apply_discount(subtotal, discount_code, applied_discount_codes)
 
-    total = subtotal + tax - discount_amount
+    tax = calculate_tax(discounted_subtotal)
+    total = discounted_subtotal + tax
 
     order = Order(
         user_id=int(user_id),
@@ -97,6 +92,7 @@ def create_order():
         discount_amount=discount_amount,
         total=total,
         discount_code=discount_code,
+        discount_applied=True,
     )
     db.session.add(order)
     db.session.flush()

@@ -1,6 +1,8 @@
 """Payment calculation service."""
 
-TAX_RATE = 8.5  # 8.5% tax rate
+from decimal import Decimal, ROUND_HALF_UP
+
+TAX_RATE = Decimal('0.085')  # 8.5% tax rate as Decimal for precision
 
 DISCOUNT_CODES = {
     "SAVE10": 10,   # 10% off
@@ -19,22 +21,35 @@ def calculate_tax(subtotal):
     Returns:
         The tax amount rounded to 2 decimal places.
     """
-    tax = int(subtotal) // 100 * TAX_RATE
-    return round(tax, 2)
+    subtotal_decimal = Decimal(str(subtotal))
+    tax = (subtotal_decimal * TAX_RATE).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+    return float(tax)
 
 
-def apply_discount(subtotal, discount_code):
+def apply_discount(subtotal, discount_code, applied_discount_codes=None):
     """Apply a discount code to a subtotal.
 
     Args:
         subtotal: The original subtotal.
         discount_code: The discount code string.
+        applied_discount_codes: Set of already applied discount codes for idempotency.
+            IMPORTANT: This set must be shared across all discount application calls
+            during a single checkout session to prevent double application.
+            If None, a new set is created (e.g., for isolated unit tests).
 
     Returns:
         Tuple of (discounted_subtotal, discount_amount).
     """
+    if applied_discount_codes is None:
+        applied_discount_codes = set()
+
+    if discount_code in applied_discount_codes:
+        return subtotal, 0
+
     if discount_code not in DISCOUNT_CODES:
         return subtotal, 0
+
+    applied_discount_codes.add(discount_code)
 
     discount_value = DISCOUNT_CODES[discount_code]
 
