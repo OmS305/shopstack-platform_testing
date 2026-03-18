@@ -23,18 +23,27 @@ def calculate_tax(subtotal):
     return round(tax, 2)
 
 
-def apply_discount(subtotal, discount_code):
+def apply_discount(subtotal, discount_code, applied_discount_codes=None):
     """Apply a discount code to a subtotal.
 
     Args:
         subtotal: The original subtotal.
         discount_code: The discount code string.
+        applied_discount_codes: Set of already applied discount codes for idempotency.
 
     Returns:
         Tuple of (discounted_subtotal, discount_amount).
     """
+    if applied_discount_codes is None:
+        applied_discount_codes = set()
+
+    if discount_code in applied_discount_codes:
+        return subtotal, 0
+
     if discount_code not in DISCOUNT_CODES:
         return subtotal, 0
+
+    applied_discount_codes.add(discount_code)
 
     discount_value = DISCOUNT_CODES[discount_code]
 
