@@ -33,18 +33,9 @@ def calculate_total():
     
     total = discounted_subtotal + tax
     
-    # Check if discount has already been applied to avoid double application
-    from app.models.order import Order
-    order = Order.query.filter_by(user_id=get_jwt_identity(), discount_code=discount_code).first()
-    if order and order.discount_applied:
-        return jsonify({
-            "subtotal": subtotal,
-            "discount_code": discount_code,
-            "discount_amount": 0,
-            "discounted_subtotal": subtotal,
-            "tax": tax,
-            "total": order.total,
-        }), 200
+    # Discount should NOT be applied in /calculate endpoint — only for preview
+    # Actual discount application happens in order creation (POST /orders)
+    # This endpoint should return undiscounted subtotal + tax for UI preview purposes
     
     return jsonify({
         "subtotal": subtotal,
