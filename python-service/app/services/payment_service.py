@@ -16,14 +16,17 @@ def calculate_tax(subtotal):
     """Calculate tax amount for a given subtotal.
 
     Args:
-        subtotal: The pre-tax subtotal amount.
+        subtotal: The pre-tax subtotal amount (can be int, float, Decimal, or str).
 
     Returns:
-        The tax amount rounded to 2 decimal places.
+        The tax amount rounded to 2 decimal places as float.
     """
-    # Round to 2 decimal places before conversion to avoid floating-point representation artifacts
-    subtotal = round(subtotal, 2)
-    subtotal_decimal = Decimal(str(subtotal))
+    # Explicitly convert to float first to handle Decimal/str inputs robustly
+    # Then round to 2 decimal places to avoid floating-point representation artifacts
+    subtotal_float = float(subtotal)
+    subtotal_rounded = round(subtotal_float, 2)
+    # Use Decimal for precise tax calculation
+    subtotal_decimal = Decimal(str(subtotal_rounded))
     tax = (subtotal_decimal * TAX_RATE).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
     return float(tax)
 
