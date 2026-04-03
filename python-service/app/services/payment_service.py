@@ -19,7 +19,7 @@ def calculate_tax(subtotal):
     Returns:
         The tax amount rounded to 2 decimal places.
     """
-    tax = float(subtotal) * (TAX_RATE / 100)
+    tax = float(subtotal) * (float(TAX_RATE) / 100)
     return round(tax, 2)
 
 
