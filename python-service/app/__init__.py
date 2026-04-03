@@ -18,7 +18,7 @@ class CustomJSONProvider(DefaultJSONProvider):
         if isinstance(obj, (datetime, date)):
             return obj.isoformat()
         if isinstance(obj, Decimal):
-            return float(obj)
+            return str(obj)
         return super().default(obj)
 
 
