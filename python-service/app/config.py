@@ -16,6 +16,9 @@ def _build_postgres_uri(default_host="localhost"):
     user = _env("DATABASE_USER", "DB_USER", "appuser")
     password = _env("DATABASE_PASSWORD", "DB_PASS", "apppassword")
     host = _env("DATABASE_HOST", "DB_HOST", default_host)
+    # Override host to 'postgres' if running in staging/production and host is empty or localhost
+    if default_host == "postgres" and host in ("", "localhost"):
+        host = "postgres"
     port = _env("DATABASE_PORT", "DB_PORT", "5432")
     name = _env("DATABASE_NAME", "DB_NAME", "ecommerce")
     return f"postgresql://{user}:{password}@{host}:{port}/{name}"
