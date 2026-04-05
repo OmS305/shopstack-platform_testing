@@ -50,9 +50,11 @@ def login():
     if not user:
         return jsonify({"error": "Invalid email or password"}), 401
 
+    # Encode hash to bytes if it's a string (for compatibility with bcrypt >=4.0)
+    password_hash_bytes = user.password_hash.encode("utf-8") if isinstance(user.password_hash, str) else user.password_hash
     is_valid = bcrypt.checkpw(
         data["password"].encode("utf-8"),
-        user.password_hash.encode("utf-8")
+        password_hash_bytes
     )
 
     if not is_valid:
