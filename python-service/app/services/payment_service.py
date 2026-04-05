@@ -14,12 +14,14 @@ def calculate_tax(subtotal):
     """Calculate tax amount for a given subtotal.
 
     Args:
-        subtotal: The pre-tax subtotal amount.
+        subtotal: The pre-tax subtotal amount (in dollars or cents; handled as float).
 
     Returns:
         The tax amount rounded to 2 decimal places.
     """
-    tax = float(subtotal) * (TAX_RATE / 100)
+    # Ensure subtotal is treated as float to avoid integer division or truncation
+    subtotal_float = float(subtotal)
+    tax = subtotal_float * (TAX_RATE / 100)
     return round(tax, 2)
 
 
