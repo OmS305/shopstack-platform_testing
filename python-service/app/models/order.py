@@ -16,7 +16,7 @@ class Order(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    items = db.relationship("OrderItem", backref="order", lazy="joined")
+    items = db.relationship("OrderItem", backref="order", lazy="selectin")
 
     def to_dict(self, include_items=False):
         result = {
@@ -46,7 +46,7 @@ class OrderItem(db.Model):
     unit_price = db.Column(db.Numeric(10, 2), nullable=False)
     total_price = db.Column(db.Numeric(10, 2), nullable=False)
 
-    product = db.relationship("Product")
+    product = db.relationship("Product", lazy="joined")
 
     def to_dict(self):
         return {
